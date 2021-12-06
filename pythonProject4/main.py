@@ -4,10 +4,34 @@ from cryptography.fernet import Fernet
 import os
 import hashlib
 import binascii
-from tkinter import *
+import tkinter as tk
 master_key = b'Cp1hH7cSCOO1hpp5yQx3kPDh7rQ_4VdFjoTp1GuyH_c='
 
 
+class passwordApp(tk.Tk):
+    def __init__(self):
+        tk.Tk.__init__(self)
+        self.title("Password Manager")
+        self.greeting = tk.Label(self, text="Welcome to our Password Storage service.\nPlease enter you name and password",
+                         font=("ariel", 16, "bold")).grid(row=0, column=1)
+        self.name_label = tk.Label(self, text="Name:").grid(row=1, column=0)
+        self.websiteEntry = tk.Entry(self)
+        self.nameEntry = tk.Entry(self)
+        self.nameEntry.grid(row=1, column=1)
+        self.password_label = tk.Label(self, text="Password:").grid(row=2, column=0)
+        self.passwordEntry = tk.Entry(self)
+        self.passwordEntry.grid(row=2, column=1)
+        self.confirm = tk.Button(self, text='Login', bd='5',command=self.on_button).grid(row=3, column=1)
+
+    def on_button(self):
+        print(self.nameEntry.get())
+
+
+app = passwordApp()
+app.mainloop()
+
+
+"""
 def create_user(name, password):
     salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
     hashedPassword = hashlib.pbkdf2_hmac(
@@ -59,6 +83,7 @@ def encrypt_password(website, name, password):
     f2 = open("keys.txt", "a")
     f2.write(f"{encryptedKey}\n")
     f2.close()
+    return True
 
 
 def decrypt_password(number):
@@ -107,6 +132,31 @@ def show_password(number):
     view3.mainloop()
 
 
+def password_confirmation(websiteEntry, nameEntry, passwordEntry):
+    website = websiteEntry.get()
+    name = nameEntry.get()
+    password = passwordEntry.get()
+    if encrypt_password(website, name, password):
+        view4 = Tk()
+        view4.title("Success")
+        Label(view4, text="You have successfully added a new password", font="bold").grid(row=0, column=0)
+        view4.mainloop()
+        submit()
+
+
+def add_password():
+    view3 = Tk()
+    view3.title("Add Password")
+    Label(view3, text="Website:").grid(row=0, column=0)
+    Label(view3, text="UserName:").grid(row=1, column=0)
+    Label(view3, text="Password:").grid(row=2, column=0)
+    tkinter.Entry(view3, textvariable=websiteEntry).grid(row=0, column=1)
+    tkinter.Entry(view3, textvariable=nameEntry).grid(row=1, column=1)
+    tkinter.Entry(view3, textvariable=passwordEntry).grid(row=2, column=1)
+    Button(view3, text='confirm', bd='5', command=lambda: password_confirmation(websiteEntry, nameEntry, passwordEntry)).grid(row=3, column=1)
+    view3.mainloop()
+
+
 def submit():
     name = nameEntry.get()
     password = passwordEntry.get()
@@ -124,6 +174,7 @@ def submit():
             t = i-1
             Button(view2, text='View Password', bd='5',command=lambda t=t: show_password(t)).grid(row=i, column=2)
             i += 1
+        Button(view2, text='Add Password', bd='5', command=add_password).grid(row=i, column=2)
         view2.mainloop()
     else:
         view2 = Tk()
@@ -133,16 +184,17 @@ def submit():
 
 
 view = Tk()
+websiteEntry = tkinter.StringVar()
 nameEntry = tkinter.StringVar()
 passwordEntry = tkinter.StringVar()
 view.title("Password Manager")
 greeting = Label(view, text="Welcome to our Password Storage service.\nPlease enter you name and password", font=("ariel", 16, "bold")).grid(row=0, column=1)
 name_label = Label(view, text="Name:").grid(row=1, column=0)
 name = tkinter.Entry(view, textvariable = nameEntry).grid(row=1, column=1)
-password_label = name_label = Label(view, text="Password:").grid(row=2, column=0)
+password_label = Label(view, text="Password:").grid(row=2, column=0)
 password = tkinter.Entry(view, textvariable = passwordEntry).grid(row=2, column=1)
 confirm = Button(view, text='Login', bd='5',command=submit).grid(row=3, column=1)
 view.mainloop()
-
+"""
 
 
