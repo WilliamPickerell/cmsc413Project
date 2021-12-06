@@ -21,10 +21,68 @@ class passwordApp(tk.Tk):
         self.password_label = tk.Label(self, text="Password:").grid(row=2, column=0)
         self.passwordEntry = tk.Entry(self)
         self.passwordEntry.grid(row=2, column=1)
-        self.confirm = tk.Button(self, text='Login', bd='5',command=self.on_button).grid(row=3, column=1)
+        self.confirm = tk.Button(self, text='Login', bd='5',command=self.submit).grid(row=3, column=1)
 
     def on_button(self):
         print(self.nameEntry.get())
+
+    def submit(self):
+        name = self.nameEntry.get()
+        password = self.passwordEntry.get()
+        if self.login_user(name, password):
+            for child in self.winfo_children():
+                child.destroy()
+            self.title("Password Manager")
+            self.website = tk.Label(self, text="Website:", font="bold").grid(row=0, column=0)
+            self.name = tk.Label(self, text="UserName:", font="bold").grid(row=0, column=1)
+            listOfSites = self.get_websites_names()
+            i = 1
+            for site in listOfSites:
+                tk.Label(self, text=site[0]).grid(row=i, column=0)
+                tk.Label(self, text=site[1]).grid(row=i, column=1)
+                t = i - 1
+                #tk.Button(self, text='View Password', bd='5', command=lambda t=t: show_password(t)).grid(row=i, column=2)
+                i += 1
+            #tk.Button(self, text='Add Password', bd='5', command=add_password).grid(row=i, column=2)
+            self.mainloop()
+        else:
+            view2 = tk.Tk()
+            view2.title("Password Manager")
+            tk.Label(view2, text="wrong name or password").grid(row=0, column=0)
+            view2.mainloop()
+
+    def login_user(self, name, password):
+        f1 = open("user.txt", "r")
+        lines = f1.readlines()
+        for line in lines:
+            info = line.split(",")
+            if info[0] == name:
+                end = len(info[1]) - 1
+                salt = info[1][2:66]
+                key = info[1][66:end]
+                new_key = hashlib.pbkdf2_hmac(
+                    'sha256',
+                    password.encode('utf-8'),
+                    salt.encode('ascii'),
+                    100000
+                )
+                new_key = binascii.hexlify(new_key).decode('ascii')
+                if new_key == key:
+                    return True
+                else:
+                    return False
+            else:
+                return False
+
+    def get_websites_names(self):
+        f1 = open("passwords.txt", "r")
+        listOfSites = []
+        lines = f1.readlines()
+        for line in lines:
+            info = line.split(",")
+            webName = [info[0], info[1]]
+            listOfSites.append(webName)
+        return listOfSites
 
 
 app = passwordApp()
@@ -45,31 +103,6 @@ def create_user(name, password):
     f1 = open("user.txt", "w")
     f1.write(name + f",{storage}")
     f1.close()
-
-
-def login_user(name, password):
-    f1 = open("user.txt", "r")
-    lines = f1.readlines()
-    for line in lines:
-        info = line.split(",")
-        if info[0] == name:
-            end = len(info[1]) - 1
-            salt = info[1][2:66]
-            key = info[1][66:end]
-            new_key = hashlib.pbkdf2_hmac(
-                'sha256',
-                password.encode('utf-8'),
-                salt.encode('ascii'),
-                100000
-            )
-            new_key = binascii.hexlify(new_key).decode('ascii')
-            if new_key == key:
-                return True
-            else:
-                return False
-        else:
-            return False
-
 
 def encrypt_password(website, name, password):
     key = Fernet.generate_key()
@@ -113,17 +146,6 @@ def decrypt_password(number):
     return password
 
 
-def get_websites_names():
-    f1 = open("passwords.txt","r")
-    listOfSites = []
-    lines = f1.readlines()
-    for line in lines:
-        info = line.split(",")
-        webName = [info[0], info[1]]
-        listOfSites.append(webName)
-    return listOfSites
-
-
 def show_password(number):
     password = decrypt_password(number)
     view3 = Tk()
@@ -155,46 +177,6 @@ def add_password():
     tkinter.Entry(view3, textvariable=passwordEntry).grid(row=2, column=1)
     Button(view3, text='confirm', bd='5', command=lambda: password_confirmation(websiteEntry, nameEntry, passwordEntry)).grid(row=3, column=1)
     view3.mainloop()
-
-
-def submit():
-    name = nameEntry.get()
-    password = passwordEntry.get()
-    if login_user(name, password):
-        view.destroy()
-        view2 = Tk()
-        view2.title("Password Manager")
-        Label(view2, text="Website:", font="bold").grid(row=0, column=0)
-        Label(view2, text="UserName:", font="bold").grid(row=0, column=1)
-        listOfSites = get_websites_names()
-        i = 1
-        for site in listOfSites:
-            Label(view2, text=site[0]).grid(row=i, column=0)
-            Label(view2, text=site[1]).grid(row=i, column=1)
-            t = i-1
-            Button(view2, text='View Password', bd='5',command=lambda t=t: show_password(t)).grid(row=i, column=2)
-            i += 1
-        Button(view2, text='Add Password', bd='5', command=add_password).grid(row=i, column=2)
-        view2.mainloop()
-    else:
-        view2 = Tk()
-        view2.title("Password Manager")
-        Label(view2, text="wrong name or password").grid(row=0, column=0)
-        view2.mainloop()
-
-
-view = Tk()
-websiteEntry = tkinter.StringVar()
-nameEntry = tkinter.StringVar()
-passwordEntry = tkinter.StringVar()
-view.title("Password Manager")
-greeting = Label(view, text="Welcome to our Password Storage service.\nPlease enter you name and password", font=("ariel", 16, "bold")).grid(row=0, column=1)
-name_label = Label(view, text="Name:").grid(row=1, column=0)
-name = tkinter.Entry(view, textvariable = nameEntry).grid(row=1, column=1)
-password_label = Label(view, text="Password:").grid(row=2, column=0)
-password = tkinter.Entry(view, textvariable = passwordEntry).grid(row=2, column=1)
-confirm = Button(view, text='Login', bd='5',command=submit).grid(row=3, column=1)
-view.mainloop()
 """
 
 
