@@ -22,9 +22,21 @@ class passwordApp(tk.Tk):
         self.passwordEntry = tk.Entry(self)
         self.passwordEntry.grid(row=2, column=1)
         self.confirm = tk.Button(self, text='Login', bd='5',command=self.submit).grid(row=3, column=1)
+        self.addUser = tk.Button(self, text='Create Account', bd='5',command=self.create_user_screen).grid(row=4, column=1)
 
-    def on_button(self):
-        print(self.nameEntry.get())
+    def create_user_screen(self):
+        for child in self.winfo_children():
+            child.destroy()
+        self.title("New User")
+        tk.Label(self, text="Warning creating a new user\nwill delete all stored passwords").grid(row=0, column=1)
+        tk.Label(self, text="Name:").grid(row=1, column=0)
+        tk.Label(self, text="Password:").grid(row=2, column=0)
+        self.nameEntry = tk.Entry(self)
+        self.nameEntry.grid(row=1, column=1)
+        self.passwordEntry = tk.Entry(self)
+        self.passwordEntry.grid(row=2, column=1)
+        self.confirm = tk.Button(self, text='Login', bd='5', command=self.create_user).grid(row=3, column=1)
+        self.mainloop()
 
     def submit(self):
         name = self.nameEntry.get()
@@ -165,7 +177,9 @@ class passwordApp(tk.Tk):
         f2.close()
         return True
 
-    def create_user(self, name, password):
+    def create_user(self):
+        name = self.nameEntry.get()
+        password = self.passwordEntry.get()
         salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
         hashedPassword = hashlib.pbkdf2_hmac(
             'sha256',
@@ -178,6 +192,17 @@ class passwordApp(tk.Tk):
         f1 = open("user.txt", "w")
         f1.write(name + f",{storage}")
         f1.close()
+        f1 = open("passwords.txt", "w")
+        f1.write("")
+        f1.close()
+        f1 = open("keys.txt", "w")
+        f1.write("")
+        f1.close()
+        view4 = tk.Tk()
+        view4.title("Success")
+        tk.Label(view4, text="You have successfully created a new user", font="bold").grid(row=0, column=0)
+        self.write_main_window()
+        view4.mainloop()
 
     def delete_password(self, number):
         f1 = open("passwords.txt", "r")
