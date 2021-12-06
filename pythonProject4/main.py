@@ -51,6 +51,8 @@ class passwordApp(tk.Tk):
             t = i - 1
             tk.Button(self, text='View Password', bd='5', command=lambda t=t: self.show_password(t)).grid(row=i,
                                                                                                           column=2)
+            tk.Button(self, text='Delete Password', bd='5', command=lambda t=t: self.delete_password(t)).grid(row=i,
+                                                                                                              column=3)
             i += 1
         tk.Button(self, text='Add Password', bd='5', command=self.add_password).grid(row=i, column=2)
         self.mainloop()
@@ -149,7 +151,6 @@ class passwordApp(tk.Tk):
             self.write_main_window()
             view4.mainloop()
 
-
     def encrypt_password(self, website, name, password):
         key = Fernet.generate_key()
         passwordEncryptor = Fernet(key)
@@ -177,6 +178,34 @@ class passwordApp(tk.Tk):
         f1 = open("user.txt", "w")
         f1.write(name + f",{storage}")
         f1.close()
+
+    def delete_password(self, number):
+        f1 = open("passwords.txt", "r")
+        f2 = open("keys.txt", "r")
+        lines = f1.readlines()
+        i = 0
+        newLines1 = []
+        for line in lines:
+            if i != number:
+                newLines1.append(line)
+            i += 1
+        f1.close()
+        f1 = open("passwords.txt", "w")
+        f1.writelines(newLines1)
+        f1.close()
+        lines = f2.readlines()
+        i = 0
+        newLines2 = []
+        for line in lines:
+            if i != number:
+                newLines2.append(line)
+            i += 1
+        f2.close()
+        f2 = open("keys.txt", "w")
+        f2.writelines(newLines2)
+        f2.close()
+        self.write_main_window()
+
 
 app = passwordApp()
 app.mainloop()
