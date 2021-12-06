@@ -1,7 +1,10 @@
+import tkinter
+
 from cryptography.fernet import Fernet
 import os
 import hashlib
 import binascii
+from tkinter import *
 master_key = b'Cp1hH7cSCOO1hpp5yQx3kPDh7rQ_4VdFjoTp1GuyH_c='
 
 
@@ -44,14 +47,14 @@ def login_user(name, password):
             return False
 
 
-def encrypt_password(name, password):
+def encrypt_password(website, name, password):
     key = Fernet.generate_key()
     passwordEncryptor = Fernet(key)
     encryptedPassword = passwordEncryptor.encrypt(password.encode())
     keyEncryptor = Fernet(master_key)
     encryptedKey = keyEncryptor.encrypt(key)
     f1 = open("passwords.txt", "a")
-    f1.write(name+f",{encryptedPassword}\n")
+    f1.write(website+","+name+f",{encryptedPassword}\n")
     f1.close()
     f2 = open("keys.txt", "a")
     f2.write(f"{encryptedKey}\n")
@@ -59,7 +62,6 @@ def encrypt_password(name, password):
 
 
 def decrypt_password(number):
-    name = ""
     encryptedPassword = ""
     encryptedKey = ""
     f1 = open("passwords.txt", "r")
@@ -69,7 +71,6 @@ def decrypt_password(number):
     for line in lines:
         if i == number:
             parts = line.split(",")
-            name = parts[0]
             end = len(parts[1]) - 2
             encryptedPassword = parts[1][2:end]
         i += 1
@@ -87,10 +88,30 @@ def decrypt_password(number):
     return password
 
 
+def submit():
+    name = nameEntry.get()
+    password = passwordEntry.get()
+    print(login_user(name, password))
+
+
 if __name__ == '__main__':
     #encrypt_password("test", "test1")
     #pword = decrypt_password(1)
     #create_user("William", "password123")
-    print(login_user("William", "password123"))
+    view = Tk()
+    nameEntry = tkinter.StringVar()
+    passwordEntry = tkinter.StringVar()
+    view.geometry("600x600")
+    view.title("Password Manager")
+    greeting = Label(view, text="Welcome to our Password Storage service.\nPlease enter you name and password", font=("ariel", 16, "bold")).grid(row=0, column=1)
+    name_label = Label(view, text="Name:").grid(row=1, column=0)
+    name = tkinter.Entry(view, textvariable = nameEntry).grid(row=1, column=1)
+    password_label = name_label = Label(view, text="Password:").grid(row=2, column=0)
+    password = tkinter.Entry(view, textvariable = passwordEntry).grid(row=2, column=1)
+    confirm = Button(view, text='Login', bd='5',
+                 command=submit).grid(row=3, column=1)
+
+    view.mainloop()
+    #print(login_user("William", "password123"))
     #print(pword)
 
