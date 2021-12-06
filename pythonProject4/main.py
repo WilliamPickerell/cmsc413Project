@@ -71,8 +71,8 @@ def decrypt_password(number):
     for line in lines:
         if i == number:
             parts = line.split(",")
-            end = len(parts[1]) - 2
-            encryptedPassword = parts[1][2:end]
+            end = len(parts[2]) - 2
+            encryptedPassword = parts[2][2:end]
         i += 1
     lines = f2.readlines()
     i = 0
@@ -88,30 +88,56 @@ def decrypt_password(number):
     return password
 
 
+def get_websites_names():
+    f1 = open("passwords.txt","r")
+    listOfSites = []
+    lines = f1.readlines()
+    for line in lines:
+        info = line.split(",")
+        webName = [info[0], info[1]]
+        listOfSites.append(webName)
+    return listOfSites
+
+
+def show_password(number):
+    password = decrypt_password(number)
+    view3 = Tk()
+    view3.title("Password")
+    Label(view3, text=password).grid(row=0, column=0)
+    view3.mainloop()
+
+
 def submit():
     name = nameEntry.get()
     password = passwordEntry.get()
-    print(login_user(name, password))
+    if login_user(name, password):
+        view.destroy()
+        view2 = Tk()
+        view2.title("Password Manager")
+        Label(view2, text="Website:", font="bold").grid(row=0, column=0)
+        Label(view2, text="UserName:", font="bold").grid(row=0, column=1)
+        listOfSites = get_websites_names()
+        i = 1
+        for site in listOfSites:
+            Label(view2, text=site[0]).grid(row=i, column=0)
+            Label(view2, text=site[1]).grid(row=i, column=1)
+            t = i-1
+            Button(view2, text='View Password', bd='5',command=lambda t=t: show_password(t)).grid(row=i, column=2)
+            i += 1
+        view2.mainloop()
 
 
-if __name__ == '__main__':
-    #encrypt_password("test", "test1")
-    #pword = decrypt_password(1)
-    #create_user("William", "password123")
-    view = Tk()
-    nameEntry = tkinter.StringVar()
-    passwordEntry = tkinter.StringVar()
-    view.geometry("600x600")
-    view.title("Password Manager")
-    greeting = Label(view, text="Welcome to our Password Storage service.\nPlease enter you name and password", font=("ariel", 16, "bold")).grid(row=0, column=1)
-    name_label = Label(view, text="Name:").grid(row=1, column=0)
-    name = tkinter.Entry(view, textvariable = nameEntry).grid(row=1, column=1)
-    password_label = name_label = Label(view, text="Password:").grid(row=2, column=0)
-    password = tkinter.Entry(view, textvariable = passwordEntry).grid(row=2, column=1)
-    confirm = Button(view, text='Login', bd='5',
-                 command=submit).grid(row=3, column=1)
+view = Tk()
+nameEntry = tkinter.StringVar()
+passwordEntry = tkinter.StringVar()
+view.title("Password Manager")
+greeting = Label(view, text="Welcome to our Password Storage service.\nPlease enter you name and password", font=("ariel", 16, "bold")).grid(row=0, column=1)
+name_label = Label(view, text="Name:").grid(row=1, column=0)
+name = tkinter.Entry(view, textvariable = nameEntry).grid(row=1, column=1)
+password_label = name_label = Label(view, text="Password:").grid(row=2, column=0)
+password = tkinter.Entry(view, textvariable = passwordEntry).grid(row=2, column=1)
+confirm = Button(view, text='Login', bd='5',command=submit).grid(row=3, column=1)
+view.mainloop()
 
-    view.mainloop()
-    #print(login_user("William", "password123"))
-    #print(pword)
+
 
