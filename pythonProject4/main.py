@@ -125,6 +125,11 @@ def submit():
             Button(view2, text='View Password', bd='5',command=lambda t=t: show_password(t)).grid(row=i, column=2)
             i += 1
         view2.mainloop()
+    else:
+        view2 = Tk()
+        view2.title("Password Manager")
+        Label(view2, text="wrong name or password").grid(row=0, column=0)
+        view2.mainloop()
 
 
 view = Tk()
