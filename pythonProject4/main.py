@@ -89,7 +89,7 @@ class passwordApp(tk.Tk):
         for line in lines:
             info = line.split(",")
             if info[0] == name:
-                end = len(info[1]) - 1
+                end = len(info[1]) - 2
                 salt = info[1][2:66]
                 key = info[1][66:end]
                 new_key = hashlib.pbkdf2_hmac(
@@ -101,10 +101,8 @@ class passwordApp(tk.Tk):
                 new_key = binascii.hexlify(new_key).decode('ascii')
                 if new_key == key:
                     return True
-                else:
-                    return False
-            else:
-                return False
+
+        return False
 
     def get_websites_names(self):
         f1 = open(self.user + "passwords.txt", "r")
@@ -204,8 +202,8 @@ class passwordApp(tk.Tk):
         )
         hashedPassword = binascii.hexlify(hashedPassword)
         storage = salt + hashedPassword
-        f1 = open("user.txt", "w")
-        f1.write(name + f",{storage}")
+        f1 = open("user.txt", "a")
+        f1.write(name + f",{storage}\n")
         f1.close()
         f1 = open(self.user +"passwords.txt", "w")
         f1.write("")
