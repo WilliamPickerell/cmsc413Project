@@ -32,7 +32,7 @@ class passwordApp(tk.Tk):
         self.addUser = tk.Button(self, text='Create Account', bd='5', command=self.create_user_screen).grid(row=4,
                                                                                                             column=1)
 
-        button_quit = tk.Button(self, text='Exit Application', bd='5', command=self.quit).grid(row=5,
+        button_quit = tk.Button(self, text='Exit Application', bd='5', command=self.destroy).grid(row=5,
                                                                                                column=1)
 
     def create_user_screen(self):
@@ -48,7 +48,7 @@ class passwordApp(tk.Tk):
         self.passwordEntry.grid(row=2, column=1)
         self.confirm = tk.Button(self, text='Login', bd='5', command=self.create_user).grid(row=3, column=1)
 
-        button_quit = tk.Button(self, text='Exit Application', bd='5', command=self.quit).grid(row=5,
+        button_quit = tk.Button(self, text='Exit Application', bd='5', command=self.destroy).grid(row=5,
                                                                                                column=1)
         self.mainloop()
 
@@ -84,7 +84,7 @@ class passwordApp(tk.Tk):
                                                                                                               column=4)
             i += 1
         tk.Button(self, text='Add Password', bd='5', command=self.add_password).grid(row=i, column=2)
-        button_quit = tk.Button(self, text='Exit Application', bd='5', command=self.quit).grid(row=i + 1,
+        button_quit = tk.Button(self, text='Exit Application', bd='5', command=self.destroy).grid(row=i + 1,
                                                                                                column=1)
 
         button_restart = tk.Button(self, text='Logout', bd='5', command=lambda: self.restart()).grid(row=i + 2,
