@@ -37,7 +37,7 @@ class passwordApp(tk.Tk):
         for child in self.winfo_children():
             child.destroy()
         self.title("New User")
-        tk.Label(self, text="Warning creating a new user\nwill delete all stored passwords").grid(row=0, column=1)
+        tk.Label(self, text="Please enter your name and password").grid(row=0, column=1)
         tk.Label(self, text="Name:").grid(row=1, column=0)
         tk.Label(self, text="Password:").grid(row=2, column=0)
         self.nameEntry = tk.Entry(self)
