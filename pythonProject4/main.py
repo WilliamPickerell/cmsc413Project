@@ -32,8 +32,8 @@ class passwordApp(tk.Tk):
         self.addUser = tk.Button(self, text='Create Account', bd='5', command=self.create_user_screen).grid(row=4,
                                                                                                             column=1)
 
-        button_quit = tk.Button(self, text='Exit Application', bd='5', command=self.destroy).grid(row=5,
-                                                                                               column=1)
+        button_quit = tk.Button(self, text='Exit Application', bd='5', command=self.quit).grid(row=5,
+                                                                                                            column=1)
 
     def create_user_screen(self):
         for child in self.winfo_children():
@@ -47,9 +47,6 @@ class passwordApp(tk.Tk):
         self.passwordEntry = tk.Entry(self, show="*")
         self.passwordEntry.grid(row=2, column=1)
         self.confirm = tk.Button(self, text='Login', bd='5', command=self.create_user).grid(row=3, column=1)
-
-        button_quit = tk.Button(self, text='Exit Application', bd='5', command=self.destroy).grid(row=5,
-                                                                                               column=1)
         self.mainloop()
 
     def submit(self):
