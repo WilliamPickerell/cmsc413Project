@@ -18,6 +18,7 @@ class passwordApp(tk.Tk):
         self.greeting = tk.Label(self,
                                  text="\n\nWelcome to our Password Storage service.                \nPlease enter you name and password\n\n",
                                  font=("ariel", 16, "bold")).grid(row=0, column=1)
+
         self.name_label = tk.Label(self, text="Name:").grid(row=1, column=0)
         self.websiteEntry = tk.Entry(self)
         self.nameEntry = tk.Entry(self)
@@ -31,7 +32,7 @@ class passwordApp(tk.Tk):
                                                                                                             column=1)
 
         button_quit = tk.Button(self, text='Exit Application', bd='5', command=self.quit).grid(row=5,
-                                                                                                            column=1)
+                                                                                               column=1)
 
     def create_user_screen(self):
         for child in self.winfo_children():
@@ -51,20 +52,20 @@ class passwordApp(tk.Tk):
         name = self.nameEntry.get()
         password = self.passwordEntry.get()
         if self.login_user(name, password):
-            self.write_main_window()
+            self.write_main_window(name)
         else:
             view2 = tk.Tk()
             view2.title("Password Manager")
             tk.Label(view2, text="wrong name or password").grid(row=0, column=0)
             view2.mainloop()
 
-    def write_main_window(self):
+    def write_main_window(self, name):
         for child in self.winfo_children():
             child.destroy()
         self.title("Password Manager")
         self.website = tk.Label(self, text="Website:", font="bold").grid(row=0, column=0)
         self.name = tk.Label(self, text="UserName:", font="bold").grid(row=0, column=1)
-        listOfSites = self.get_websites_names()
+        listOfSites = self.get_websites_names(name)
         i = 1
         for site in listOfSites:
             tk.Label(self, text=site[0]).grid(row=i, column=0)
@@ -75,14 +76,14 @@ class passwordApp(tk.Tk):
             tk.Button(self, text='Edit Password', bd='5',
                       command=lambda t=t, site=site: self.edit_password(site[0], site[1], t)). \
                 grid(row=i, column=3)
-            tk.Button(self, text='Delete Password', bd='5', command=lambda t=t: self.delete_password(t)).grid(row=i,
+            tk.Button(self, text='Delete Password', bd='5', command=lambda t=t: self.delete_password(name, t)).grid(row=i,
                                                                                                               column=4)
             i += 1
         tk.Button(self, text='Add Password', bd='5', command=self.add_password).grid(row=i, column=2)
         self.mainloop()
 
     def login_user(self, name, password):
-        f1 = open("user.txt", "r")
+        f1 = open(name +"user.txt", "r")
         lines = f1.readlines()
         for line in lines:
             info = line.split(",")
@@ -104,8 +105,8 @@ class passwordApp(tk.Tk):
             else:
                 return False
 
-    def get_websites_names(self):
-        f1 = open("passwords.txt", "r")
+    def get_websites_names(self, name):
+        f1 = open(name + "passwords.txt", "r")
         listOfSites = []
         lines = f1.readlines()
         for line in lines:
@@ -114,18 +115,18 @@ class passwordApp(tk.Tk):
             listOfSites.append(webName)
         return listOfSites
 
-    def show_password(self, number):
-        password = self.decrypt_password(number)
+    def show_password(self, name, number):
+        password = self.decrypt_password(name, number)
         view3 = tk.Tk()
         view3.title("Password")
         tk.Label(view3, text=password).grid(row=0, column=0)
         view3.mainloop()
 
-    def decrypt_password(self, number):
+    def decrypt_password(self, name, number):
         encryptedPassword = ""
         encryptedKey = ""
-        f1 = open("passwords.txt", "r")
-        f2 = open("keys.txt", "r")
+        f1 = open(name +"passwords.txt", "r")
+        f2 = open(name + "keys.txt", "r")
         lines = f1.readlines()
         i = 0
         for line in lines:
@@ -172,7 +173,7 @@ class passwordApp(tk.Tk):
             view4 = tk.Tk()
             view4.title("Success")
             tk.Label(view4, text="You have successfully added a new password", font="bold").grid(row=0, column=0)
-            self.write_main_window()
+            self.write_main_window(name)
             view4.mainloop()
 
     def encrypt_password(self, website, name, password):
@@ -181,10 +182,10 @@ class passwordApp(tk.Tk):
         encryptedPassword = passwordEncryptor.encrypt(password.encode())
         keyEncryptor = Fernet(master_key)
         encryptedKey = keyEncryptor.encrypt(key)
-        f1 = open("passwords.txt", "a")
+        f1 = open(name +"passwords.txt", "a")
         f1.write(website + "," + name + f",{encryptedPassword}\n")
         f1.close()
-        f2 = open("keys.txt", "a")
+        f2 = open(name +"keys.txt", "a")
         f2.write(f"{encryptedKey}\n")
         f2.close()
         return True
@@ -201,19 +202,19 @@ class passwordApp(tk.Tk):
         )
         hashedPassword = binascii.hexlify(hashedPassword)
         storage = salt + hashedPassword
-        f1 = open("user.txt", "w")
+        f1 = open(name + "user.txt", "w")
         f1.write(name + f",{storage}")
         f1.close()
-        f1 = open("passwords.txt", "w")
+        f1 = open(name + "passwords.txt", "w")
         f1.write("")
         f1.close()
-        f1 = open("keys.txt", "w")
+        f1 = open(name + "keys.txt", "w")
         f1.write("")
         f1.close()
         view4 = tk.Tk()
         view4.title("Success")
         tk.Label(view4, text="You have successfully created a new user", font="bold").grid(row=0, column=0)
-        self.write_main_window()
+        self.write_main_window(name)
         view4.mainloop()
 
     def edit_password(self, website, name, number):
@@ -233,19 +234,19 @@ class passwordApp(tk.Tk):
         self.passwordEntry = tk.Entry(self, show="*")
         self.passwordEntry.insert(0, password)
         self.passwordEntry.grid(row=2, column=1)
-        tk.Button(self, text='confirm', bd='5', command=lambda: self.edit_password_manager(number)).grid(row=3,
+        tk.Button(self, text='confirm', bd='5', command=lambda: self.edit_password_manager(name, number)).grid(row=3,
                                                                                                          column=1)
 
-    def edit_password_manager(self, number):
+    def edit_password_manager(self, name, number):
         website = self.websiteEntry.get()
         name = self.nameEntry.get()
         password = self.passwordEntry.get()
         self.encrypt_password(website, name, password)
-        self.delete_password(number)
+        self.delete_password(name, number)
 
-    def delete_password(self, number):
-        f1 = open("passwords.txt", "r")
-        f2 = open("keys.txt", "r")
+    def delete_password(self, name, number):
+        f1 = open(name +"passwords.txt", "r")
+        f2 = open(name +"keys.txt", "r")
         lines = f1.readlines()
         i = 0
         newLines1 = []
@@ -254,7 +255,7 @@ class passwordApp(tk.Tk):
                 newLines1.append(line)
             i += 1
         f1.close()
-        f1 = open("passwords.txt", "w")
+        f1 = open(name +"passwords.txt", "w")
         f1.writelines(newLines1)
         f1.close()
         lines = f2.readlines()
@@ -265,10 +266,10 @@ class passwordApp(tk.Tk):
                 newLines2.append(line)
             i += 1
         f2.close()
-        f2 = open("keys.txt", "w")
+        f2 = open(name +"keys.txt", "w")
         f2.writelines(newLines2)
         f2.close()
-        self.write_main_window()
+        self.write_main_window(name)
 
 
 app = passwordApp()
