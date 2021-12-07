@@ -93,7 +93,7 @@ class passwordApp(tk.Tk):
 
     def restart(self):
         self.destroy()
-        os.startfile("main.py")
+        self.__init__()
 
     def random_password(self):
         self.write_main_window()
