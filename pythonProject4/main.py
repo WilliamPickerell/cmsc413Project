@@ -5,6 +5,7 @@ import os
 import hashlib
 import binascii
 import tkinter as tk
+
 master_key = b'Cp1hH7cSCOO1hpp5yQx3kPDh7rQ_4VdFjoTp1GuyH_c='
 
 
@@ -12,8 +13,11 @@ class passwordApp(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
         self.title("Password Manager")
-        self.greeting = tk.Label(self, text="Welcome to our Password Storage service.\nPlease enter you name and password",
-                         font=("ariel", 16, "bold")).grid(row=0, column=1)
+        self.frame = tkinter.Frame(self, highlightbackground="blue", highlightthickness=10, width=600, height=260, bd=0)
+        self.frame.place(relx=0)
+        self.greeting = tk.Label(self,
+                                 text="\n\nWelcome to our Password Storage service.\nPlease enter you name and password\n\n",
+                                 font=("ariel", 16, "bold")).grid(row=0, column=1)
         self.name_label = tk.Label(self, text="Name:").grid(row=1, column=0)
         self.websiteEntry = tk.Entry(self)
         self.nameEntry = tk.Entry(self)
@@ -21,8 +25,9 @@ class passwordApp(tk.Tk):
         self.password_label = tk.Label(self, text="Password:").grid(row=2, column=0)
         self.passwordEntry = tk.Entry(self, show="*")
         self.passwordEntry.grid(row=2, column=1)
-        self.confirm = tk.Button(self, text='Login', bd='5',command=self.submit).grid(row=3, column=1)
-        self.addUser = tk.Button(self, text='Create Account', bd='5',command=self.create_user_screen).grid(row=4, column=1)
+        self.confirm = tk.Button(self, text='Login', bd='5', command=self.submit).grid(row=3, column=1)
+        self.addUser = tk.Button(self, text='Create Account', bd='5', command=self.create_user_screen).grid(row=4,
+                                                                                                            column=1)
 
     def create_user_screen(self):
         for child in self.winfo_children():
@@ -63,7 +68,8 @@ class passwordApp(tk.Tk):
             t = i - 1
             tk.Button(self, text='View Password', bd='5', command=lambda t=t: self.show_password(t)).grid(row=i,
                                                                                                           column=2)
-            tk.Button(self, text='Edit Password', bd='5', command=lambda t=t, site=site: self.edit_password(site[0], site[1], t)).\
+            tk.Button(self, text='Edit Password', bd='5',
+                      command=lambda t=t, site=site: self.edit_password(site[0], site[1], t)). \
                 grid(row=i, column=3)
             tk.Button(self, text='Delete Password', bd='5', command=lambda t=t: self.delete_password(t)).grid(row=i,
                                                                                                               column=4)
@@ -151,7 +157,7 @@ class passwordApp(tk.Tk):
         self.passwordEntry = tk.Entry(self, show="*")
         self.passwordEntry.grid(row=2, column=1)
         tk.Button(self, text='confirm', bd='5',
-               command= self.password_confirmation).grid(row=3, column=1)
+                  command=self.password_confirmation).grid(row=3, column=1)
         self.mainloop()
 
     def password_confirmation(self):
@@ -223,7 +229,8 @@ class passwordApp(tk.Tk):
         self.passwordEntry = tk.Entry(self, show="*")
         self.passwordEntry.insert(0, password)
         self.passwordEntry.grid(row=2, column=1)
-        tk.Button(self, text='confirm', bd='5', command=lambda: self.edit_password_manager(number)).grid(row=3, column=1)
+        tk.Button(self, text='confirm', bd='5', command=lambda: self.edit_password_manager(number)).grid(row=3,
+                                                                                                         column=1)
 
     def edit_password_manager(self, number):
         website = self.websiteEntry.get()
@@ -262,6 +269,3 @@ class passwordApp(tk.Tk):
 
 app = passwordApp()
 app.mainloop()
-
-
-
