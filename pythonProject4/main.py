@@ -12,6 +12,7 @@ master_key = b'Cp1hH7cSCOO1hpp5yQx3kPDh7rQ_4VdFjoTp1GuyH_c='
 class passwordApp(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
+        self.user = ""
         self.title("Password Manager")
         self.frame = tkinter.Frame(self, highlightbackground="blue", highlightthickness=10, width=600, height=290, bd=0)
         self.frame.place(relx=0)
