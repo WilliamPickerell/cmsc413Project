@@ -1,3 +1,4 @@
+import sys
 import tkinter
 
 from cryptography.fernet import Fernet
@@ -32,7 +33,7 @@ class passwordApp(tk.Tk):
                                                                                                             column=1)
 
         button_quit = tk.Button(self, text='Exit Application', bd='5', command=self.quit).grid(row=5,
-                                                                                                            column=1)
+                                                                                               column=1)
 
     def create_user_screen(self):
         for child in self.winfo_children():
@@ -46,6 +47,9 @@ class passwordApp(tk.Tk):
         self.passwordEntry = tk.Entry(self, show="*")
         self.passwordEntry.grid(row=2, column=1)
         self.confirm = tk.Button(self, text='Login', bd='5', command=self.create_user).grid(row=3, column=1)
+
+        button_quit = tk.Button(self, text='Exit Application', bd='5', command=self.quit).grid(row=5,
+                                                                                               column=1)
         self.mainloop()
 
     def submit(self):
@@ -63,8 +67,8 @@ class passwordApp(tk.Tk):
         for child in self.winfo_children():
             child.destroy()
         self.title("Password Manager")
-        self.website = tk.Label(self, text="Website:", font="bold").grid(row=0, column=0)
-        self.name = tk.Label(self, text="UserName:", font="bold").grid(row=0, column=1)
+        self.website = tk.Label(self, text="Password list:", font="bold").grid(row=0, column=0)
+        self.name = tk.Label(self, text="", font="bold").grid(row=0, column=1)
         listOfSites = self.get_websites_names()
         i = 1
         for site in listOfSites:
@@ -80,7 +84,19 @@ class passwordApp(tk.Tk):
                                                                                                               column=4)
             i += 1
         tk.Button(self, text='Add Password', bd='5', command=self.add_password).grid(row=i, column=2)
+        button_quit = tk.Button(self, text='Exit Application', bd='5', command=self.quit).grid(row=i + 1,
+                                                                                               column=1)
+
+        button_restart = tk.Button(self, text='Logout', bd='5', command=lambda: self.restart()).grid(row=i + 2,
+                                                                                                     column=1)
         self.mainloop()
+
+    def restart(self):
+        self.destroy()
+        os.startfile("main.py")
+
+    def random_password(self):
+        self.write_main_window()
 
     def login_user(self, name, password):
         self.user = name
@@ -162,6 +178,11 @@ class passwordApp(tk.Tk):
         self.passwordEntry.grid(row=2, column=1)
         tk.Button(self, text='confirm', bd='5',
                   command=self.password_confirmation).grid(row=3, column=1)
+        button_quit = tk.Button(self, text='Return to password list', bd='5', command=self.write_main_window).grid(
+            row=5,
+            column=1)
+        button_quit = tk.Button(self, text='Exit Application', bd='5', command=self.quit).grid(row=6,
+                                                                                               column=1)
         self.mainloop()
 
     def password_confirmation(self):
@@ -181,10 +202,10 @@ class passwordApp(tk.Tk):
         encryptedPassword = passwordEncryptor.encrypt(password.encode())
         keyEncryptor = Fernet(master_key)
         encryptedKey = keyEncryptor.encrypt(key)
-        f1 = open(self.user +"passwords.txt", "a")
+        f1 = open(self.user + "passwords.txt", "a")
         f1.write(website + "," + name + f",{encryptedPassword}\n")
         f1.close()
-        f2 = open(self.user +"keys.txt", "a")
+        f2 = open(self.user + "keys.txt", "a")
         f2.write(f"{encryptedKey}\n")
         f2.close()
         return True
@@ -205,10 +226,10 @@ class passwordApp(tk.Tk):
         f1 = open("user.txt", "a")
         f1.write(name + f",{storage}\n")
         f1.close()
-        f1 = open(self.user +"passwords.txt", "w")
+        f1 = open(self.user + "passwords.txt", "w")
         f1.write("")
         f1.close()
-        f1 = open(self.user +"keys.txt", "w")
+        f1 = open(self.user + "keys.txt", "w")
         f1.write("")
         f1.close()
         view4 = tk.Tk()
@@ -245,8 +266,8 @@ class passwordApp(tk.Tk):
         self.delete_password(number)
 
     def delete_password(self, number):
-        f1 = open(self.user +"passwords.txt", "r")
-        f2 = open(self.user +"keys.txt", "r")
+        f1 = open(self.user + "passwords.txt", "r")
+        f2 = open(self.user + "keys.txt", "r")
         lines = f1.readlines()
         i = 0
         newLines1 = []
@@ -255,7 +276,7 @@ class passwordApp(tk.Tk):
                 newLines1.append(line)
             i += 1
         f1.close()
-        f1 = open(self.user +"passwords.txt", "w")
+        f1 = open(self.user + "passwords.txt", "w")
         f1.writelines(newLines1)
         f1.close()
         lines = f2.readlines()
@@ -266,7 +287,7 @@ class passwordApp(tk.Tk):
                 newLines2.append(line)
             i += 1
         f2.close()
-        f2 = open(self.user +"keys.txt", "w")
+        f2 = open(self.user + "keys.txt", "w")
         f2.writelines(newLines2)
         f2.close()
         self.write_main_window()
