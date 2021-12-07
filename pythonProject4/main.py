@@ -63,8 +63,10 @@ class passwordApp(tk.Tk):
             t = i - 1
             tk.Button(self, text='View Password', bd='5', command=lambda t=t: self.show_password(t)).grid(row=i,
                                                                                                           column=2)
+            tk.Button(self, text='Edit Password', bd='5', command=lambda t=t, site=site: self.edit_password(site[0], site[1], t)).\
+                grid(row=i, column=3)
             tk.Button(self, text='Delete Password', bd='5', command=lambda t=t: self.delete_password(t)).grid(row=i,
-                                                                                                              column=3)
+                                                                                                              column=4)
             i += 1
         tk.Button(self, text='Add Password', bd='5', command=self.add_password).grid(row=i, column=2)
         self.mainloop()
@@ -203,6 +205,32 @@ class passwordApp(tk.Tk):
         tk.Label(view4, text="You have successfully created a new user", font="bold").grid(row=0, column=0)
         self.write_main_window()
         view4.mainloop()
+
+    def edit_password(self, website, name, number):
+        password = self.decrypt_password(number)
+        for child in self.winfo_children():
+            child.destroy()
+        self.title("Add Password")
+        tk.Label(self, text="Website:").grid(row=0, column=0)
+        tk.Label(self, text="UserName:").grid(row=1, column=0)
+        tk.Label(self, text="Password:").grid(row=2, column=0)
+        self.websiteEntry = tk.Entry(self)
+        self.websiteEntry.insert(0, website)
+        self.websiteEntry.grid(row=0, column=1)
+        self.nameEntry = tk.Entry(self)
+        self.nameEntry.insert(0, name)
+        self.nameEntry.grid(row=1, column=1)
+        self.passwordEntry = tk.Entry(self, show="*")
+        self.passwordEntry.insert(0, password)
+        self.passwordEntry.grid(row=2, column=1)
+        tk.Button(self, text='confirm', bd='5', command=lambda: self.edit_password_manager(number)).grid(row=3, column=1)
+
+    def edit_password_manager(self, number):
+        website = self.websiteEntry.get()
+        name = self.nameEntry.get()
+        password = self.passwordEntry.get()
+        self.encrypt_password(website, name, password)
+        self.delete_password(number)
 
     def delete_password(self, number):
         f1 = open("passwords.txt", "r")
