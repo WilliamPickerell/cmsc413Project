@@ -82,6 +82,7 @@ class passwordApp(tk.Tk):
         self.mainloop()
 
     def login_user(self, name, password):
+        self.user = name
         f1 = open("user.txt", "r")
         lines = f1.readlines()
         for line in lines:
@@ -105,7 +106,7 @@ class passwordApp(tk.Tk):
                 return False
 
     def get_websites_names(self):
-        f1 = open("passwords.txt", "r")
+        f1 = open(self.user + "passwords.txt", "r")
         listOfSites = []
         lines = f1.readlines()
         for line in lines:
@@ -124,8 +125,8 @@ class passwordApp(tk.Tk):
     def decrypt_password(self, number):
         encryptedPassword = ""
         encryptedKey = ""
-        f1 = open("passwords.txt", "r")
-        f2 = open("keys.txt", "r")
+        f1 = open(self.user + "passwords.txt", "r")
+        f2 = open(self.user + "keys.txt", "r")
         lines = f1.readlines()
         i = 0
         for line in lines:
@@ -181,16 +182,17 @@ class passwordApp(tk.Tk):
         encryptedPassword = passwordEncryptor.encrypt(password.encode())
         keyEncryptor = Fernet(master_key)
         encryptedKey = keyEncryptor.encrypt(key)
-        f1 = open("passwords.txt", "a")
+        f1 = open(self.user +"passwords.txt", "a")
         f1.write(website + "," + name + f",{encryptedPassword}\n")
         f1.close()
-        f2 = open("keys.txt", "a")
+        f2 = open(self.user +"keys.txt", "a")
         f2.write(f"{encryptedKey}\n")
         f2.close()
         return True
 
     def create_user(self):
         name = self.nameEntry.get()
+        self.user = name
         password = self.passwordEntry.get()
         salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
         hashedPassword = hashlib.pbkdf2_hmac(
@@ -204,10 +206,10 @@ class passwordApp(tk.Tk):
         f1 = open("user.txt", "w")
         f1.write(name + f",{storage}")
         f1.close()
-        f1 = open("passwords.txt", "w")
+        f1 = open(self.user +"passwords.txt", "w")
         f1.write("")
         f1.close()
-        f1 = open("keys.txt", "w")
+        f1 = open(self.user +"keys.txt", "w")
         f1.write("")
         f1.close()
         view4 = tk.Tk()
@@ -244,8 +246,8 @@ class passwordApp(tk.Tk):
         self.delete_password(number)
 
     def delete_password(self, number):
-        f1 = open("passwords.txt", "r")
-        f2 = open("keys.txt", "r")
+        f1 = open(self.user +"passwords.txt", "r")
+        f2 = open(self.user +"keys.txt", "r")
         lines = f1.readlines()
         i = 0
         newLines1 = []
@@ -254,7 +256,7 @@ class passwordApp(tk.Tk):
                 newLines1.append(line)
             i += 1
         f1.close()
-        f1 = open("passwords.txt", "w")
+        f1 = open(self.user +"passwords.txt", "w")
         f1.writelines(newLines1)
         f1.close()
         lines = f2.readlines()
@@ -265,7 +267,7 @@ class passwordApp(tk.Tk):
                 newLines2.append(line)
             i += 1
         f2.close()
-        f2 = open("keys.txt", "w")
+        f2 = open(self.user +"keys.txt", "w")
         f2.writelines(newLines2)
         f2.close()
         self.write_main_window()
