@@ -213,30 +213,44 @@ class passwordApp(tk.Tk):
     def create_user(self):
         name = self.nameEntry.get()
         self.user = name
-        password = self.passwordEntry.get()
-        salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
-        hashedPassword = hashlib.pbkdf2_hmac(
-            'sha256',
-            password.encode('utf-8'),
-            salt,
-            100000,
-        )
-        hashedPassword = binascii.hexlify(hashedPassword)
-        storage = salt + hashedPassword
-        f1 = open("user.txt", "a")
-        f1.write(name + f",{storage}\n")
-        f1.close()
-        f1 = open(self.user + "passwords.txt", "w")
-        f1.write("")
-        f1.close()
-        f1 = open(self.user + "keys.txt", "w")
-        f1.write("")
-        f1.close()
-        view4 = tk.Tk()
-        view4.title("Success")
-        tk.Label(view4, text="You have successfully created a new user", font="bold").grid(row=0, column=0)
-        self.write_main_window()
-        view4.mainloop()
+        f1 = open("user.txt", "r")
+        userDoesNotExist = True
+        lines = f1.readlines()
+        for line in lines:
+            info = line.split(",")
+            if info[0] == name:
+                userDoesNotExist = False
+
+        if userDoesNotExist:
+            password = self.passwordEntry.get()
+            salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
+            hashedPassword = hashlib.pbkdf2_hmac(
+                'sha256',
+                password.encode('utf-8'),
+                salt,
+                100000,
+            )
+            hashedPassword = binascii.hexlify(hashedPassword)
+            storage = salt + hashedPassword
+            f1 = open("user.txt", "a")
+            f1.write(name + f",{storage}\n")
+            f1.close()
+            f1 = open(self.user + "passwords.txt", "w")
+            f1.write("")
+            f1.close()
+            f1 = open(self.user + "keys.txt", "w")
+            f1.write("")
+            f1.close()
+            view4 = tk.Tk()
+            view4.title("Success")
+            tk.Label(view4, text="You have successfully created a new user", font="bold").grid(row=0, column=0)
+            self.write_main_window()
+            view4.mainloop()
+        else:
+            view4 = tk.Tk()
+            view4.title("Failure")
+            tk.Label(view4, text="That user already exists", font="bold").grid(row=0, column=0)
+            view4.mainloop()
 
     def edit_password(self, website, name, number):
         password = self.decrypt_password(number)
