@@ -163,7 +163,6 @@ class passwordApp(tk.Tk):
         i = 0
         for line in lines:
             if i == number:
-                #parts = line.split(",")
                 end = len(line) - 2
                 encryptedPassword = line[2:end]
             i += 1
