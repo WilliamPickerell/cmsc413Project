@@ -120,11 +120,28 @@ class passwordApp(tk.Tk):
     def get_websites_names(self):
         f1 = open(self.user + "passwords.txt", "r")
         listOfSites = []
+        encryptedPassword = []
+        encryptedKey = []
+        f1 = open(self.user + "passwords.txt", "r")
+        f2 = open(self.user + "keys.txt", "r")
         lines = f1.readlines()
+        i = 0
         for line in lines:
-            info = line.split(",")
-            webName = [info[0], info[1]]
-            listOfSites.append(webName)
+            end = len(line) - 2
+            encryptedPassword.append(line[2:end])
+        lines = f2.readlines()
+        for line in lines:
+            end = line.__len__() - 2
+            encryptedKey.append(line[2:end])
+        i = 0
+        for encrypted in encryptedPassword:
+            keyDecryptor = Fernet(master_key)
+            key = keyDecryptor.decrypt(encryptedKey[i].encode())
+            passwordDecryptor = Fernet(key)
+            webNamepassword = passwordDecryptor.decrypt(encrypted.encode()).decode()
+            info = webNamepassword.split(",")
+            listOfSites.append(info)
+            i+=1
         return listOfSites
 
     def show_password(self, number):
@@ -143,9 +160,8 @@ class passwordApp(tk.Tk):
         i = 0
         for line in lines:
             if i == number:
-                parts = line.split(",")
-                end = len(parts[2]) - 2
-                encryptedPassword = parts[2][2:end]
+                end = len(line) - 2
+                encryptedPassword = line[2:end]
             i += 1
         lines = f2.readlines()
         i = 0
@@ -157,7 +173,9 @@ class passwordApp(tk.Tk):
         keyDecryptor = Fernet(master_key)
         key = keyDecryptor.decrypt(encryptedKey.encode())
         passwordDecryptor = Fernet(key)
-        password = passwordDecryptor.decrypt(encryptedPassword.encode()).decode()
+        webNamepassword = passwordDecryptor.decrypt(encryptedPassword.encode()).decode()
+        info = webNamepassword.split(",")
+        password = info[2]
         return password
 
     def add_password(self):
@@ -195,12 +213,13 @@ class passwordApp(tk.Tk):
 
     def encrypt_password(self, website, name, password):
         key = Fernet.generate_key()
+        webNamePass = website+ "," + name + "," + password
         passwordEncryptor = Fernet(key)
-        encryptedPassword = passwordEncryptor.encrypt(password.encode())
+        encryptedPassword = passwordEncryptor.encrypt(webNamePass.encode())
         keyEncryptor = Fernet(master_key)
         encryptedKey = keyEncryptor.encrypt(key)
         f1 = open(self.user + "passwords.txt", "a")
-        f1.write(website + "," + name + f",{encryptedPassword}\n")
+        f1.write(f"{encryptedPassword}\n")
         f1.close()
         f2 = open(self.user + "keys.txt", "a")
         f2.write(f"{encryptedKey}\n")
@@ -210,30 +229,44 @@ class passwordApp(tk.Tk):
     def create_user(self):
         name = self.nameEntry.get()
         self.user = name
-        password = self.passwordEntry.get()
-        salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
-        hashedPassword = hashlib.pbkdf2_hmac(
-            'sha256',
-            password.encode('utf-8'),
-            salt,
-            100000,
-        )
-        hashedPassword = binascii.hexlify(hashedPassword)
-        storage = salt + hashedPassword
-        f1 = open("user.txt", "a")
-        f1.write(name + f",{storage}\n")
-        f1.close()
-        f1 = open(self.user + "passwords.txt", "w")
-        f1.write("")
-        f1.close()
-        f1 = open(self.user + "keys.txt", "w")
-        f1.write("")
-        f1.close()
-        view4 = tk.Tk()
-        view4.title("Success")
-        tk.Label(view4, text="You have successfully created a new user", font="bold").grid(row=0, column=0)
-        self.write_main_window()
-        view4.mainloop()
+        f1 = open("user.txt", "r")
+        userDoesNotExist = True
+        lines = f1.readlines()
+        for line in lines:
+            info = line.split(",")
+            if info[0] == name:
+                userDoesNotExist = False
+
+        if userDoesNotExist:
+            password = self.passwordEntry.get()
+            salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
+            hashedPassword = hashlib.pbkdf2_hmac(
+                'sha256',
+                password.encode('utf-8'),
+                salt,
+                100000,
+            )
+            hashedPassword = binascii.hexlify(hashedPassword)
+            storage = salt + hashedPassword
+            f1 = open("user.txt", "a")
+            f1.write(name + f",{storage}\n")
+            f1.close()
+            f1 = open(self.user + "passwords.txt", "w")
+            f1.write("")
+            f1.close()
+            f1 = open(self.user + "keys.txt", "w")
+            f1.write("")
+            f1.close()
+            view4 = tk.Tk()
+            view4.title("Success")
+            tk.Label(view4, text="You have successfully created a new user", font="bold").grid(row=0, column=0)
+            self.write_main_window()
+            view4.mainloop()
+        else:
+            view4 = tk.Tk()
+            view4.title("Failure")
+            tk.Label(view4, text="That user already exists", font="bold").grid(row=0, column=0)
+            view4.mainloop()
 
     def edit_password(self, website, name, number):
         password = self.decrypt_password(number)
